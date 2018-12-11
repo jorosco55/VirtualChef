@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class VritualCafeApplication {
+public class VirtualCafeApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(VritualCafeApplication.class, args);
+		SpringApplication.run(VirtualCafeApplication.class, args);
 	}
 }

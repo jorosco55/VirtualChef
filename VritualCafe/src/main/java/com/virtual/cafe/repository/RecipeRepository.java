@@ -9,6 +9,7 @@ import com.virtual.cafe.model.Recipe;
 
 @Repository
 public interface RecipeRepository extends MongoRepository<Recipe, String> {
-	public Recipe findbyRecipeName(String recipeName);
+    
+	public Recipe findByRecipeName(String recipeName);
 	public List<Recipe> findByServings(int servings);
 }

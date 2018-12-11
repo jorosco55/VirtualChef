@@ -1,21 +1,46 @@
 package com.virtual.cafe.model;
 
+import javax.persistence.GeneratedValue;
+import javax.validation.constraints.NotNull;
+
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
+@Document(collection = "recipe")
 public class Recipe {
+    
 	@Id
-	String id;
+	@NotNull
+	@GeneratedValue
+	@JsonProperty(value="id", access=Access.READ_ONLY)
+	ObjectId id;
+
+    // The indexed allows it to be searchable, and the unique constraint makes it so
+	// you can't have duplicates with the same name
+	@Indexed(unique = true)
+	@NotNull
+	@JsonProperty
 	String recipeName;
+	
+	@JsonProperty
 	String recipeIngrediants;
+	
+	@Indexed
+	@JsonProperty
 	int servings;
 	
-	public Recipe(String recipeName, String recipeIngrediants, int servings) {
-		this.recipeName = recipeName;
-		this.recipeIngrediants = recipeIngrediants;
-		this.servings = servings;
-	}
+	public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId  id) {
+        this.id = id;
+    }
 
 	public String getRecipeName() {
 		return recipeName;

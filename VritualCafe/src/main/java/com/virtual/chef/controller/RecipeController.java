@@ -2,51 +2,64 @@ package com.virtual.chef.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
+import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.virtual.cafe.model.Recipe;
-import com.virtual.cafe.service.RecipeService;
+import com.virtual.cafe.repository.RecipeRepository;
 
 @RestController
+@RequestMapping("/recipes")
 public class RecipeController {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(RecipeController.class);
+    
+    @Autowired
+    private RecipeRepository recipeRepository;
 	
-	@Autowired
-	private RecipeService recipeService;
-	
-	@RequestMapping("/create")
-	public String create(@RequestParam String recipeName, @RequestParam String recipeIngrediants, @RequestParam int servings) {
-		Recipe newRecipe = recipeService.create(recipeName, recipeIngrediants, servings);
-		return newRecipe.toString();
+	@RequestMapping(value = "/", method = RequestMethod.POST)
+	public Recipe createRecipe(@Valid @RequestBody Recipe recipe) {
+	    LOGGER.info( "Creating Recipe: " + recipe.getRecipeName());
+		return recipeRepository.save(recipe);
 	}
 	
-	@RequestMapping("/get")
-	public Recipe getRecipe(@RequestParam String recipeName) {
-		return recipeService.getByRecipeName(recipeName);
+	@RequestMapping(value = "/name/{recipeName}", method = RequestMethod.GET)
+	public Recipe getRecipe(@PathVariable String recipeName) {
+	    LOGGER.info( "Finding Receipe: " + recipeName );
+		return recipeRepository.findByRecipeName(recipeName);
 	}
 	
-	@RequestMapping("/getAll")
+	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public List<Recipe> getAll(){
-		return recipeService.getAll();
+		return recipeRepository.findAll();
 	}
 	
-	@RequestMapping("/update")
-	public String update(@RequestParam String recipeName, @RequestParam String recipeIngrediants, @RequestParam int servings) {
-		Recipe newRecipe = recipeService.update(recipeName, recipeIngrediants, servings);
-		return newRecipe.toString();
+	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+	public void update(@PathVariable("id") String id, @Valid @RequestBody Recipe recipe) {
+		recipe.setId(new ObjectId(id));
+		recipeRepository.save(recipe);
 	}
 	
-	@RequestMapping("/delete")
-	public String delete(@RequestParam String recipeName, @RequestParam String recipeIngrediants, @RequestParam int servings) {
-		recipeService.delete(recipeName);
-		return "Deleted: " + recipeName;
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	public Recipe delete(@PathVariable String id) {
+	    Recipe recipe = recipeRepository.findById(id).get();
+	    recipeRepository.delete(recipe);
+		return recipe;
 	}
 	
-	@RequestMapping("/deleteAll")
-	public String deleteAll() {
-		recipeService.deleteAll();
-		return "Deleted all recipes";
+	// Need to be careful with this as this will delete all of the recipes
+	@RequestMapping(value = "/deleteAll", method = RequestMethod.DELETE)
+	public void deleteAll() {
+	    recipeRepository.deleteAll();
+	    LOGGER.info( "Deleted all recipes" );
 	}
 }

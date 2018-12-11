@@ -1,0 +1,4 @@
+*.classpath
+*.project
+.settings
+VritualCafe/target/classes/log4j2-spring.xml
